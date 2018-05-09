@@ -1,7 +1,7 @@
-﻿<Application x:Class="AsyncThreads.Wpf.App"
+﻿<Application x:Class="AsyncPresentation.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:AsyncThreads.Wpf"
+             xmlns:local="clr-namespace:AsyncPresentation"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

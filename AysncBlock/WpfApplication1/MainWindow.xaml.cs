@@ -16,16 +16,16 @@
 
         private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            doWorkAsync().Wait();
+            System.Diagnostics.Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            var task = await doWorkAsync();//.ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
 
-            //System.Diagnostics.Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
-            //await doWorkAsync().ConfigureAwait(false);
-            //System.Diagnostics.Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            doWorkAsync().ConfigureAwait(false);
         }
 
         private async Task doWorkAsync()
         {
-            await Task.Delay(1000);
+            Task.Delay(1000).Wait();
         }
     }
 }
