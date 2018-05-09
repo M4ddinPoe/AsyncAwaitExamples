@@ -28,6 +28,11 @@
             return await Task.FromResult(parameter + 1);
         }
 
+        private int SomeSynchronousMethod(int parameter)
+        {
+            return parameter + 1;
+        }
+
         public sealed class DoSomethingAsyncStateMachine : IAsyncStateMachine
         {
             public AsyncTaskMethodBuilder<int> __builder;
@@ -43,13 +48,16 @@
                 {
                     TaskAwaiter<int> taskAwaiter;
 
-                    // When in initial state
+                    // Wenn im initialen Status
                     if (this.__state != 0)
                     {
+                        // Ausführen des synchronen Codes vor dem ersten await
+                        this.__result = this.__this.SomeSynchronousMethod(this.__parameter);
+
                         taskAwaiter = this.__this.MyMethodAsync(this.__parameter).GetAwaiter();
 
-                        // When the task is completed; return synchron
-                        // otherwise enter this block
+                        // Wenn der Task schon fertig; bleiben wir synchrn und geben das Result zurück
+                        // Ansonsten machen wir in dem folgenden block weiter
                         if (!taskAwaiter.IsCompleted)
                         {
                             this.__state = 0;
@@ -63,12 +71,16 @@
                         }
                     }
 
+                    // Für weitere async Methoden werden hier weitere States definiert. Die States werden dann positiv hochgezählt
+
+                    // Hier wird das Result aus dem Task geholt, der State auf completed gesetzt und das Result zurück gegeben
                     this.__result = this.__taskAwaiter.GetResult();
                     this.__state = -2;
                     this.__builder.SetResult(__result);
                 }
                 catch (Exception exception)
                 {
+                    // Exceptions werden hier gefangen und über den Builder an den aufrufer weiter gegeben
                     this.__state = -2;
                     this.__builder.SetException(exception);
                 }
