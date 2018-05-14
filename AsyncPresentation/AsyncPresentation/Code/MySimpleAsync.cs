@@ -15,7 +15,7 @@
 
         private async Task<int> MyMethodAsync(int parameter)
         {
-            return await Task.FromResult(parameter + 1).ConfigureAwait(continueOnCapturedContext: false);
+            return await Task.FromResult(parameter + 1);
         }
 
         private int SomeSynchronousMethod(int parameter)

@@ -11,15 +11,17 @@
         [AsyncStateMachine(typeof(DoSomethingAsyncStateMachine))]
         public Task<int> DoSomethingAsync(int parameter)
         {
+            var asyncTaskMethodBuilder = AsyncTaskMethodBuilder<int>.Create();
+
             DoSomethingAsyncStateMachine methodAsyncStateMachine = new DoSomethingAsyncStateMachine()
             {
                 __parameter = parameter,
                 __this = this,
-                __builder = AsyncTaskMethodBuilder<int>.Create(),
-                __state = -1
+                __state = -1,
+                __builder = asyncTaskMethodBuilder
             };
 
-            methodAsyncStateMachine.__builder.Start(ref methodAsyncStateMachine);
+            asyncTaskMethodBuilder.Start(ref methodAsyncStateMachine);
             return methodAsyncStateMachine.__builder.Task;
         }
 
@@ -46,26 +48,23 @@
             {
                 try
                 {
-                    TaskAwaiter<int> taskAwaiter;
-
                     // Wenn im initialen Status
                     if (this.__state != 0)
                     {
                         // Ausführen des synchronen Codes vor dem ersten await
                         this.__result = this.__this.SomeSynchronousMethod(this.__parameter);
 
-                        taskAwaiter = this.__this.MyMethodAsync(this.__parameter).GetAwaiter();
+                        this.__taskAwaiter = this.__this.MyMethodAsync(this.__parameter).GetAwaiter();
 
                         // Wenn der Task schon fertig; bleiben wir synchrn und geben das Result zurück
                         // Ansonsten machen wir in dem folgenden block weiter
-                        if (!taskAwaiter.IsCompleted)
+                        if (!this.__taskAwaiter.IsCompleted)
                         {
                             this.__state = 0;
-                            this.__taskAwaiter = taskAwaiter;
                             DoSomethingAsyncStateMachine stateMachine = this;
 
                             this.__builder
-                              .AwaitUnsafeOnCompleted(ref taskAwaiter, ref stateMachine);
+                              .AwaitUnsafeOnCompleted(ref this.__taskAwaiter, ref stateMachine);
 
                             return;
                         }
